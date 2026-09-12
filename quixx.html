@@ -356,7 +356,7 @@ document.getElementById('btn-crear-confirm').onclick = async () => {
     ordenJugadores: [myId],
     turnoActivo: 0,
     filasCerradas: { rojo:false, amarillo:false, verde:false, azul:false },
-    ronda: { activada:false, fase:'blancos', dados:null, respuestas:{}, marcoBlancosActivo:false, marcoColorActivo:false, filasCerradasSnapshot:{ rojo:false, amarillo:false, verde:false, azul:false } },
+    ronda: { activada:false, dados:null, usosBlancos:{}, marcoBlancosActivo:false, marcoColorActivo:false, filasCerradasSnapshot:{ rojo:false, amarillo:false, verde:false, azul:false } },
     planillas: { [myId]: planillaVacia() }
   });
   entrarSala(code);
@@ -513,7 +513,6 @@ function puedoMarcar(color, idx, planilla, soyYo){
   if (!ronda || !ronda.activada) return false;
   const activo = uidActivo();
   const soyActivo = activo === myId;
-  const fase = ronda.fase;
   const cerradaSnapshot = ronda.filasCerradasSnapshot ? ronda.filasCerradasSnapshot[color] : state.filasCerradas[color];
   if (cerradaSnapshot) return false;
   const maxIdx = maxIndexMarcado(planilla.filas[color]);
@@ -526,15 +525,14 @@ function puedoMarcar(color, idx, planilla, soyYo){
   const combos = combosDisponibles();
   if (!combos) return false;
 
-  if (fase === 'blancos'){
-    if (ronda.respuestas && ronda.respuestas[myId]) return false; // ya respondió esta ronda
-    return valor === combos.blanco;
-  } else if (fase === 'color'){
-    if (!soyActivo) return false;
-    if (ronda.marcoColorActivo) return false;
-    return combos[color].includes(valor);
-  }
-  return false;
+  // Paso blanco: disponible para CUALQUIER jugador (activo o no) que todavía no lo haya usado en esta tirada
+  const yaUsoBlanco = ronda.usosBlancos && ronda.usosBlancos[myId];
+  const puedeBlanco = !yaUsoBlanco && valor === combos.blanco;
+
+  // Paso color: solo el jugador activo, y solo si todavía no usó su jugada de color en esta tirada
+  const puedeColor = soyActivo && !ronda.marcoColorActivo && combos[color].includes(valor);
+
+  return puedeBlanco || puedeColor;
 }
 
 function renderMiPlanilla(soyActivo){
@@ -585,6 +583,19 @@ function renderMiPlanilla(soyActivo){
 
 async function marcarCelda(color, idx){
   const planilla = state.planillas[myId];
+  const ronda = state.ronda;
+  const activo = uidActivo();
+  const soyActivo = activo === myId;
+  const valor = FILAS[color].values[idx];
+  const combos = combosDisponibles();
+
+  const yaUsoBlanco = ronda.usosBlancos && ronda.usosBlancos[myId];
+  const esPorBlanco = !yaUsoBlanco && valor === combos.blanco;
+  const esPorColor = soyActivo && !ronda.marcoColorActivo && combos[color].includes(valor);
+  // Si el valor sirve para ambos caminos y todavía no usó ninguno, preferimos consumir el paso blanco
+  // (así el jugador activo conserva su paso de color para otra fila si le conviene).
+  const usarBlanco = esPorBlanco;
+
   const nuevasFilas = planilla.filas[color].slice();
   nuevasFilas[idx] = true;
   const updates = {};
@@ -597,20 +608,15 @@ async function marcarCelda(color, idx){
     cierraFila = true;
   }
 
-  const activo = uidActivo();
-  const soyActivo = activo === myId;
-  const fase = state.ronda.fase;
-
-  if (fase === 'blancos'){
-    updates[`${ROOT}/${currentRoom}/ronda/respuestas/${myId}`] = true;
+  if (usarBlanco){
+    updates[`${ROOT}/${currentRoom}/ronda/usosBlancos/${myId}`] = true;
     if (soyActivo) updates[`${ROOT}/${currentRoom}/ronda/marcoBlancosActivo`] = true;
-  } else if (fase === 'color' && soyActivo){
+  } else if (esPorColor){
     updates[`${ROOT}/${currentRoom}/ronda/marcoColorActivo`] = true;
   }
 
   await db.ref().update(updates);
   if (cierraFila) await checkFinDePartida();
-  if (fase === 'blancos') await checkAvanceFaseBlancos();
 }
 
 document.getElementById('modal-reglas'); // noop keep ref
@@ -670,60 +676,55 @@ function renderDados(soyActivo){
     dadosFila.appendChild(el);
   });
 
-  if (ronda.fase === 'blancos'){
-    const chip = document.createElement('div');
-    chip.className = 'chip';
-    chip.textContent = `Blancos suman ${combos.blanco}`;
-    combosZone.appendChild(chip);
-    const yaRespondi = ronda.respuestas && ronda.respuestas[myId];
-    if (!yaRespondi){
-      const btn = document.createElement('button');
-      btn.className = 'btn-s';
-      btn.style.width = 'auto';
-      btn.style.padding = '10px 22px';
-      btn.textContent = 'Paso (no tacho)';
-      btn.onclick = pasarBlancos;
-      accionZone.appendChild(btn);
-    } else {
-      const msg = document.createElement('div');
-      msg.className = 'turno-msg';
-      const totalResp = Object.keys(ronda.respuestas||{}).length;
-      const totalJug = ordenJugadoresActual().length;
-      msg.textContent = `Esperando a los demás… (${totalResp}/${totalJug})`;
-      accionZone.appendChild(msg);
+  // Chip del paso blanco (siempre visible, para todos)
+  const yaUsoBlanco = ronda.usosBlancos && ronda.usosBlancos[myId];
+  const chipBlanco = document.createElement('div');
+  chipBlanco.className = 'chip';
+  chipBlanco.textContent = `Blancos suman ${combos.blanco}` + (yaUsoBlanco ? ' ✓' : '');
+  combosZone.appendChild(chipBlanco);
+
+  // Chips del paso color, solo si soy el activo
+  if (soyActivoReal){
+    ORDEN_COLORES.forEach(color => {
+      const chip = document.createElement('div');
+      chip.className = 'chip';
+      const opts = combos[color];
+      chip.textContent = `${color[0].toUpperCase()+color.slice(1)}: ${opts[0]}${opts[1]!==opts[0] ? ' o '+opts[1] : ''}`;
+      combosZone.appendChild(chip);
+    });
+    if (ronda.marcoColorActivo){
+      const chipOk = document.createElement('div');
+      chipOk.className = 'chip';
+      chipOk.textContent = 'Jugada de color usada ✓';
+      combosZone.appendChild(chipOk);
     }
-  } else if (ronda.fase === 'color'){
-    if (soyActivoReal){
-      ORDEN_COLORES.forEach(color => {
-        const chip = document.createElement('div');
-        chip.className = 'chip';
-        const opts = combos[color];
-        chip.textContent = `${color[0].toUpperCase()+color.slice(1)}: ${opts[0]}${opts[1]!==opts[0] ? ' o '+opts[1] : ''}`;
-        combosZone.appendChild(chip);
-      });
-      if (!ronda.marcoColorActivo){
-        const btn = document.createElement('button');
-        btn.className = 'btn-s';
-        btn.style.width = 'auto';
-        btn.style.padding = '10px 22px';
-        btn.textContent = 'No puedo / no tacho más';
-        btn.onclick = terminarTurno;
-        accionZone.appendChild(btn);
-      } else {
-        const btn = document.createElement('button');
-        btn.className = 'btn-p';
-        btn.style.width = 'auto';
-        btn.style.padding = '10px 22px';
-        btn.textContent = 'Terminar turno';
-        btn.onclick = terminarTurno;
-        accionZone.appendChild(btn);
-      }
-    } else {
-      const msg = document.createElement('div');
-      msg.className = 'turno-msg';
-      msg.textContent = `${state.jugadores[activo]?.nombre} está eligiendo su jugada de color…`;
-      accionZone.appendChild(msg);
-    }
+  }
+
+  // Botón "Paso" del blanco, para cualquiera que no lo haya usado todavía
+  if (!yaUsoBlanco){
+    const btn = document.createElement('button');
+    btn.className = 'btn-s';
+    btn.style.width = 'auto';
+    btn.style.padding = '10px 18px';
+    btn.textContent = 'Paso con blancos';
+    btn.onclick = pasarBlancos;
+    accionZone.appendChild(btn);
+  }
+
+  // Botón para terminar el turno, solo para el jugador activo
+  if (soyActivoReal){
+    const btn = document.createElement('button');
+    btn.className = 'btn-p';
+    btn.style.width = 'auto';
+    btn.style.padding = '10px 22px';
+    btn.textContent = 'Terminar turno';
+    btn.onclick = terminarTurno;
+    accionZone.appendChild(btn);
+  } else {
+    const msg = document.createElement('div');
+    msg.className = 'turno-msg';
+    msg.textContent = `Podés tachar los blancos si te sirven. Esperando a ${state.jugadores[activo]?.nombre}…`;
+    accionZone.appendChild(msg);
   }
 }
 
@@ -734,9 +735,8 @@ async function tirarDados(){
   };
   await db.ref(`${ROOT}/${currentRoom}/ronda`).set({
     activada: true,
-    fase: 'blancos',
     dados,
-    respuestas: {},
+    usosBlancos: {},
     marcoBlancosActivo: false,
     marcoColorActivo: false,
     filasCerradasSnapshot: state.filasCerradas
@@ -744,19 +744,7 @@ async function tirarDados(){
 }
 
 async function pasarBlancos(){
-  await db.ref(`${ROOT}/${currentRoom}/ronda/respuestas/${myId}`).set(true);
-  await checkAvanceFaseBlancos();
-}
-
-async function checkAvanceFaseBlancos(){
-  const freshSnap = await db.ref(`${ROOT}/${currentRoom}`).once('value');
-  const fresh = freshSnap.val();
-  if (!fresh.ronda.activada || fresh.ronda.fase !== 'blancos') return;
-  const totalJug = (fresh.ordenJugadores || Object.keys(fresh.jugadores)).length;
-  const totalResp = Object.keys(fresh.ronda.respuestas || {}).length;
-  if (totalResp >= totalJug){
-    await db.ref(`${ROOT}/${currentRoom}/ronda/fase`).set('color');
-  }
+  await db.ref(`${ROOT}/${currentRoom}/ronda/usosBlancos/${myId}`).set(true);
 }
 
 async function terminarTurno(){
@@ -771,7 +759,7 @@ async function terminarTurno(){
   const siguienteTurno = (state.turnoActivo + 1) % orden.length;
   updates[`${ROOT}/${currentRoom}/turnoActivo`] = siguienteTurno;
   updates[`${ROOT}/${currentRoom}/ronda`] = {
-    activada:false, fase:'blancos', dados:null, respuestas:{},
+    activada:false, dados:null, usosBlancos:{},
     marcoBlancosActivo:false, marcoColorActivo:false,
     filasCerradasSnapshot: state.filasCerradas
   };

@@ -77,11 +77,11 @@ input.field:focus{outline:none;border-color:var(--accent)}
 .celda.amarillo-c{background:var(--amarillo);color:#1a1000}
 .celda.verde-c{background:var(--verde)}
 .celda.azul-c{background:var(--azul)}
-.celda.marcada{opacity:1;box-shadow:0 0 0 2px #fff inset}
-.celda.marcada::after{content:'✓';position:absolute;font-size:15px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+.celda.marcada{opacity:1}
+.celda.marcada::after{content:'✓';position:absolute;bottom:2px;right:2px;width:15px;height:15px;border-radius:50%;background:#fff;color:#151822;font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,.5);line-height:1}
 .celda.descartada{opacity:.22}
 .celda.descartada::after{content:'✕';position:absolute;font-size:14px;color:#fff}
-.celda.disponible{border-color:#fff;box-shadow:0 0 0 2px rgba(255,255,255,.25)}
+.celda.disponible{border-color:var(--accent);box-shadow:0 0 0 2px rgba(255,107,74,.4)}
 .celda.candado{width:38px;font-size:16px}
 .celda.bloqueada-global{opacity:.15;filter:grayscale(1)}
 .celda:not(.marcada):not(.disponible):not(.tocable){cursor:default}
@@ -344,6 +344,14 @@ function mostrarPantalla(id){
   document.getElementById(id).classList.add('active');
 }
 function rollDado(){ return 1 + Math.floor(Math.random()*6); }
+function mezclarArray(arr){
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 
 // ================= Navegación inicial =================
 document.getElementById('btn-go-crear').onclick = () => mostrarPantalla('screen-crear');
@@ -471,7 +479,9 @@ function renderLobby(){
 }
 
 document.getElementById('btn-start-game').onclick = async () => {
-  await db.ref(`${ROOT}/${currentRoom}`).update({ estado: 'jugando' });
+  const ordenActual = state.ordenJugadores || Object.keys(state.jugadores);
+  const ordenSorteado = mezclarArray(ordenActual);
+  await db.ref(`${ROOT}/${currentRoom}`).update({ estado: 'jugando', ordenJugadores: ordenSorteado, turnoActivo: 0 });
 };
 
 // ================= JUEGO =================
@@ -962,14 +972,15 @@ async function renderFin(){
 
 async function jugarDeNuevo(){
   const orden = ordenJugadoresActual();
+  const ordenSorteado = mezclarArray(orden);
   const planillasNuevas = {};
   orden.forEach(uid => { planillasNuevas[uid] = planillaVacia(); });
-  const nuevoTurnoInicial = (state.turnoActivo + 1) % orden.length;
   await db.ref(`${ROOT}/${currentRoom}`).update({
     estado: 'jugando',
+    ordenJugadores: ordenSorteado,
     planillas: planillasNuevas,
     filasCerradas: { rojo:false, amarillo:false, verde:false, azul:false },
-    turnoActivo: nuevoTurnoInicial,
+    turnoActivo: 0,
     ronda: { activada:false, dados:null, usosBlancos:{}, marcoBlancosActivo:false, marcoColorActivo:false, filasCerradasSnapshot:{ rojo:false, amarillo:false, verde:false, azul:false } }
   });
 }

@@ -69,20 +69,20 @@ input.field:focus{outline:none;border-color:var(--accent)}
 
 .mi-planilla-zone{flex:1 1 auto;overflow-y:auto;padding:14px 14px 8px;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:0}
 .planilla-title{font-size:12px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;display:flex;justify-content:space-between}
-.fila{display:flex;align-items:center;gap:7px;margin-bottom:9px}
-.fila-label{width:18px;font-size:12px;font-weight:700;color:var(--text-dim);flex-shrink:0}
-.celdas{display:flex;gap:4px;flex:1;flex-wrap:nowrap;overflow-x:auto}
-.celda{width:34px;height:40px;flex-shrink:0;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;position:relative;border:1.5px solid transparent}
+.fila{display:flex;align-items:center;gap:3px;margin-bottom:9px}
+.fila-label{width:14px;font-size:11px;font-weight:700;color:var(--text-dim);flex-shrink:0}
+.celdas{display:flex;gap:3px;flex:1;min-width:0}
+.celda{flex:1 1 0;min-width:0;height:38px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;position:relative;border:1.5px solid transparent}
 .celda.rojo-c{background:var(--rojo)}
 .celda.amarillo-c{background:var(--amarillo);color:#1a1000}
 .celda.verde-c{background:var(--verde)}
 .celda.azul-c{background:var(--azul)}
 .celda.marcada{opacity:1}
-.celda.marcada::after{content:'✓';position:absolute;bottom:2px;right:2px;width:15px;height:15px;border-radius:50%;background:#fff;color:#151822;font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,.5);line-height:1}
+.celda.marcada::after{content:'✓';position:absolute;bottom:1px;right:1px;width:13px;height:13px;border-radius:50%;background:#fff;color:#151822;font-size:9px;font-weight:900;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,.5);line-height:1}
 .celda.descartada{opacity:.22}
 .celda.descartada::after{content:'✕';position:absolute;font-size:14px;color:#fff}
 .celda.disponible{border-color:var(--accent);box-shadow:0 0 0 2px rgba(255,107,74,.4)}
-.celda.candado{width:38px;font-size:16px}
+.celda.candado{font-size:15px}
 .celda.bloqueada-global{opacity:.15;filter:grayscale(1)}
 .celda:not(.marcada):not(.disponible):not(.tocable){cursor:default}
 .celda.tocable{cursor:pointer}
@@ -118,8 +118,8 @@ input.field:focus{outline:none;border-color:var(--accent)}
 .otro-nombre{font-size:12px;font-weight:700;margin-bottom:6px;display:flex;justify-content:space-between}
 .otro-nombre .turno-tag{color:var(--accent);font-size:10px}
 .mini-fila{display:flex;align-items:center;gap:2px;margin-bottom:2px}
-.mini-label{width:11px;font-size:8px;color:var(--text-dim)}
-.mini-celda{width:11px;height:13px;border-radius:2px;flex-shrink:0}
+.mini-label{width:9px;font-size:8px;color:var(--text-dim);flex-shrink:0}
+.mini-celda{flex:1 1 0;min-width:0;height:13px;border-radius:2px}
 .mini-celda.rojo-c{background:var(--rojo)}
 .mini-celda.amarillo-c{background:var(--amarillo)}
 .mini-celda.verde-c{background:var(--verde)}
@@ -135,11 +135,18 @@ input.field:focus{outline:none;border-color:var(--accent)}
 .modal p{font-size:14px;line-height:1.55;color:var(--text-dim);margin:0 0 10px}
 .modal b{color:var(--text)}
 
-.ranking-item{display:flex;align-items:center;gap:10px;padding:12px;background:var(--panel2);border-radius:10px;margin-bottom:8px}
-.ranking-pos{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:var(--accent);width:26px}
-.ranking-nombre{flex:1;font-weight:600}
-.ranking-desglose{font-size:11px;color:var(--text-dim)}
-.ranking-total{font-family:'Syne',sans-serif;font-weight:800;font-size:20px}
+.ranking-item{display:flex;align-items:center;gap:14px;padding:18px 16px;background:var(--panel2);border-radius:14px;margin-bottom:10px}
+.ranking-item.primero{background:linear-gradient(135deg,var(--panel2),#2a2418);border:1px solid #4a3a1a}
+.ranking-pos{font-family:'Syne',sans-serif;font-weight:800;font-size:28px;color:var(--accent);width:32px;flex-shrink:0}
+.ranking-nombre{font-weight:700;font-size:19px;margin-bottom:6px}
+.ranking-colores{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:4px}
+.rc-badge{display:flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;font-size:12px;font-weight:700;color:#fff}
+.rc-badge.rojo-c{background:var(--rojo)}
+.rc-badge.amarillo-c{background:var(--amarillo);color:#1a1000}
+.rc-badge.verde-c{background:var(--verde)}
+.rc-badge.azul-c{background:var(--azul)}
+.ranking-fallas{font-size:12px;color:var(--warn);font-weight:600}
+.ranking-total{font-family:'Syne',sans-serif;font-weight:800;font-size:30px;flex-shrink:0}
 .historial-box{background:var(--panel2);border-radius:10px;padding:14px;margin-top:6px}
 .historial-box h3{font-size:13px;color:var(--text-dim);margin-bottom:8px;font-weight:600}
 .historial-row{display:flex;justify-content:space-between;font-size:14px;padding:5px 0}
@@ -894,7 +901,6 @@ function renderOtros(){
       });
       const cand = document.createElement('div');
       cand.className = `mini-celda ${color}-c` + (planilla.candados[color] ? ' marcada' : '');
-      cand.style.width = '13px';
       fila.appendChild(cand);
       div.appendChild(fila);
     });
@@ -925,13 +931,19 @@ async function renderFin(){
   rankingZone.innerHTML = '';
   resultados.forEach((r, i) => {
     const item = document.createElement('div');
-    item.className = 'ranking-item';
-    const desglose = ORDEN_COLORES.map(c => `${c[0].toUpperCase()}:${calcularPuntajeFila(r.planilla,c)}`).join(' ');
+    item.className = 'ranking-item' + (i === 0 ? ' primero' : '');
+    const badges = ORDEN_COLORES.map(c =>
+      `<span class="rc-badge ${c}-c">${c[0].toUpperCase()} ${calcularPuntajeFila(r.planilla,c)}</span>`
+    ).join('');
+    const fallasHtml = r.planilla.fallas > 0
+      ? `<div class="ranking-fallas">Fallas: ${r.planilla.fallas} (${r.planilla.fallas*-5} pts)</div>`
+      : '';
     item.innerHTML = `
-      <div class="ranking-pos">${i+1}</div>
+      <div class="ranking-pos">${i+1}${i===0 ? ' 🏆' : ''}</div>
       <div style="flex:1">
         <div class="ranking-nombre">${r.nombre}</div>
-        <div class="ranking-desglose">${desglose} · Fallas:${r.planilla.fallas*-5}</div>
+        <div class="ranking-colores">${badges}</div>
+        ${fallasHtml}
       </div>
       <div class="ranking-total">${r.total}</div>`;
     rankingZone.appendChild(item);
@@ -939,7 +951,7 @@ async function renderFin(){
 
   // Botón "Jugar de nuevo", solo para el host
   const btnRevancha = document.getElementById('btn-jugar-de-nuevo');
-  btnRevancha.style.display = (state.host === myId) ? 'block' : 'none';
+  btnRevancha.style.display = 'block';
   btnRevancha.onclick = jugarDeNuevo;
 
   // Historial — reintentamos una vez por si el guardado todavía no propagó

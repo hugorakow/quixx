@@ -67,27 +67,34 @@ input.field:focus{outline:none;border-color:var(--accent)}
 .falla-dot.on{background:var(--warn)}
 .icon-btn{background:none;border:1px solid var(--line);color:var(--text-dim);width:30px;height:30px;border-radius:8px;font-size:14px;display:flex;align-items:center;justify-content:center}
 
-.mi-planilla-zone{flex:1 1 auto;overflow-y:auto;padding:12px 12px 4px;min-height:0}
-.planilla-title{font-size:12px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;display:flex;justify-content:space-between}
-.fila{display:flex;align-items:center;gap:6px;margin-bottom:6px}
-.fila-label{width:16px;font-size:11px;font-weight:700;color:var(--text-dim);flex-shrink:0}
-.celdas{display:flex;gap:3px;flex:1;flex-wrap:nowrap;overflow-x:auto}
-.celda{width:26px;height:30px;flex-shrink:0;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;position:relative;border:1.5px solid transparent}
+.mi-planilla-zone{flex:1 1 auto;overflow-y:auto;padding:14px 14px 8px;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:0}
+.planilla-title{font-size:12px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;display:flex;justify-content:space-between}
+.fila{display:flex;align-items:center;gap:7px;margin-bottom:9px}
+.fila-label{width:18px;font-size:12px;font-weight:700;color:var(--text-dim);flex-shrink:0}
+.celdas{display:flex;gap:4px;flex:1;flex-wrap:nowrap;overflow-x:auto}
+.celda{width:34px;height:40px;flex-shrink:0;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;position:relative;border:1.5px solid transparent}
 .celda.rojo-c{background:var(--rojo)}
 .celda.amarillo-c{background:var(--amarillo);color:#1a1000}
 .celda.verde-c{background:var(--verde)}
 .celda.azul-c{background:var(--azul)}
-.celda.marcada{opacity:.28}
-.celda.marcada::after{content:'✕';position:absolute;font-size:16px;color:#fff}
+.celda.marcada{opacity:1;box-shadow:0 0 0 2px #fff inset}
+.celda.marcada::after{content:'✓';position:absolute;font-size:15px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+.celda.descartada{opacity:.22}
+.celda.descartada::after{content:'✕';position:absolute;font-size:14px;color:#fff}
 .celda.disponible{border-color:#fff;box-shadow:0 0 0 2px rgba(255,255,255,.25)}
-.celda.candado{width:30px;font-size:14px}
+.celda.candado{width:38px;font-size:16px}
 .celda.bloqueada-global{opacity:.15;filter:grayscale(1)}
 .celda:not(.marcada):not(.disponible):not(.tocable){cursor:default}
 .celda.tocable{cursor:pointer}
-.fallas-row{display:flex;align-items:center;gap:10px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
-.fallas-row .lbl{font-size:12px;color:var(--text-dim)}
-.falla-box{width:24px;height:24px;border:1.5px solid var(--warn);border-radius:5px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--warn);font-weight:700}
+.fallas-row{display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.fallas-row .lbl{font-size:13px;color:var(--text-dim)}
+.falla-box{width:28px;height:28px;border:1.5px solid var(--warn);border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--warn);font-weight:700}
 .falla-box.marcada{background:var(--warn);color:#fff}
+.tabla-puntos{margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.tabla-puntos .lbl{font-size:11px;color:var(--text-dim);margin-bottom:6px}
+.tabla-puntos-scroll{display:flex;gap:0;overflow-x:auto}
+.tp-col{flex-shrink:0;width:30px;text-align:center;font-size:11px;color:var(--text-dim);border-right:1px solid var(--line);padding:2px 0}
+.tp-col b{display:block;font-size:12px;color:var(--text);font-weight:700}
 
 .dados-zone{flex-shrink:0;background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:12px 14px}
 .dados-fila{display:flex;justify-content:center;gap:8px;margin-bottom:10px}
@@ -117,7 +124,8 @@ input.field:focus{outline:none;border-color:var(--accent)}
 .mini-celda.amarillo-c{background:var(--amarillo)}
 .mini-celda.verde-c{background:var(--verde)}
 .mini-celda.azul-c{background:var(--azul)}
-.mini-celda.marcada{opacity:.25}
+.mini-celda.marcada{opacity:1;box-shadow:0 0 0 1px #fff inset}
+.mini-celda.descartada{opacity:.2}
 .mini-fallas{font-size:10px;color:var(--warn);margin-top:4px}
 
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:50;padding:20px}
@@ -208,6 +216,10 @@ input.field:focus{outline:none;border-color:var(--accent)}
         <span class="lbl">Fallas:</span>
         <div id="mis-fallas-boxes" style="display:flex;gap:6px"></div>
       </div>
+      <div class="tabla-puntos">
+        <div class="lbl">Puntos según casilleros tachados por fila</div>
+        <div class="tabla-puntos-scroll" id="tabla-puntos-scroll"></div>
+      </div>
     </div>
 
     <div class="dados-zone">
@@ -230,7 +242,8 @@ input.field:focus{outline:none;border-color:var(--accent)}
       <h3>Historial entre ustedes</h3>
       <div id="historial-contenido"></div>
     </div>
-    <button class="btn-p" id="btn-volver-inicio" style="margin-top:18px">Volver al inicio</button>
+    <button class="btn-p" id="btn-jugar-de-nuevo" style="margin-top:18px;display:none">Jugar de nuevo (mismos jugadores)</button>
+    <button class="btn-s" id="btn-volver-inicio">Volver al inicio</button>
   </div>
 </div>
 
@@ -490,8 +503,20 @@ function renderJuego(){
   }
 
   renderMiPlanilla(soyActivo);
+  renderTablaPuntos();
   renderDados(soyActivo);
   renderOtros();
+}
+
+function renderTablaPuntos(){
+  const cont = document.getElementById('tabla-puntos-scroll');
+  if (cont.childElementCount) return; // estático, se arma una sola vez
+  for (let n=1;n<=12;n++){
+    const col = document.createElement('div');
+    col.className = 'tp-col';
+    col.innerHTML = `${n}<b>${TABLA_PUNTOS[n]}</b>`;
+    cont.appendChild(col);
+  }
 }
 
 function combosDisponibles(){
@@ -539,6 +564,7 @@ function renderMiPlanilla(soyActivo){
   const planilla = state.planillas[myId];
   const cont = document.getElementById('mi-filas');
   cont.innerHTML = '';
+  const ronda = state.ronda;
   ORDEN_COLORES.forEach(color => {
     const fila = document.createElement('div');
     fila.className = 'fila';
@@ -548,12 +574,20 @@ function renderMiPlanilla(soyActivo){
     fila.appendChild(label);
     const celdas = document.createElement('div');
     celdas.className = 'celdas';
+    // Durante una tirada activa, respetamos la foto tomada al tirar los dados:
+    // si la fila estaba abierta en ese momento, no se muestra bloqueada aunque
+    // otro jugador ya la haya cerrado mientras tanto (así ambos pueden cerrarla).
+    const cerradaVisual = (ronda && ronda.activada && ronda.filasCerradasSnapshot)
+      ? ronda.filasCerradasSnapshot[color]
+      : state.filasCerradas[color];
     FILAS[color].values.forEach((val, idx) => {
       const c = document.createElement('div');
       c.className = `celda ${color}-c`;
       c.textContent = val;
+      const maxIdx = maxIndexMarcado(planilla.filas[color]);
       if (planilla.filas[color][idx]) c.classList.add('marcada');
-      if (state.filasCerradas[color] && !planilla.filas[color][idx]) c.classList.add('bloqueada-global');
+      else if (idx < maxIdx) c.classList.add('descartada');
+      if (cerradaVisual && !planilla.filas[color][idx]) c.classList.add('bloqueada-global');
       if (puedoMarcar(color, idx, planilla, true)){
         c.classList.add('disponible','tocable');
         c.onclick = () => marcarCelda(color, idx);
@@ -565,7 +599,7 @@ function renderMiPlanilla(soyActivo){
     cand.className = `celda candado ${color}-c`;
     cand.textContent = '🔒';
     if (planilla.candados[color]) cand.classList.add('marcada');
-    if (state.filasCerradas[color] && !planilla.candados[color]) cand.classList.add('bloqueada-global');
+    if (cerradaVisual && !planilla.candados[color]) cand.classList.add('bloqueada-global');
     celdas.appendChild(cand);
     fila.appendChild(celdas);
     cont.appendChild(fila);
@@ -711,19 +745,35 @@ function renderDados(soyActivo){
     accionZone.appendChild(btn);
   }
 
-  // Botón para terminar el turno, solo para el jugador activo
+  // Jugadores que todavía no usaron (ni marcaron ni pasaron) el paso blanco
+  const orden = ordenJugadoresActual();
+  const pendientes = orden.filter(uid => !(ronda.usosBlancos && ronda.usosBlancos[uid]));
+
+  if (pendientes.length > 0){
+    const nombresPend = pendientes.map(uid => state.jugadores[uid]?.nombre).join(', ');
+    const msgPend = document.createElement('div');
+    msgPend.className = 'turno-msg';
+    msgPend.textContent = `Todavía no jugaron los blancos: ${nombresPend}`;
+    accionZone.appendChild(msgPend);
+  }
+
+  // Botón para terminar el turno, solo para el jugador activo, y solo si ya todos respondieron
   if (soyActivoReal){
     const btn = document.createElement('button');
     btn.className = 'btn-p';
     btn.style.width = 'auto';
     btn.style.padding = '10px 22px';
     btn.textContent = 'Terminar turno';
-    btn.onclick = terminarTurno;
+    if (pendientes.length > 0){
+      btn.disabled = true;
+    } else {
+      btn.onclick = terminarTurno;
+    }
     accionZone.appendChild(btn);
-  } else {
+  } else if (pendientes.length === 0){
     const msg = document.createElement('div');
     msg.className = 'turno-msg';
-    msg.textContent = `Podés tachar los blancos si te sirven. Esperando a ${state.jugadores[activo]?.nombre}…`;
+    msg.textContent = `Esperando a que ${state.jugadores[activo]?.nombre} termine su turno…`;
     accionZone.appendChild(msg);
   }
 }
@@ -778,8 +828,7 @@ async function checkFinDePartida(uidRecienFallo){
 }
 
 async function finalizarPartida(fresh){
-  await db.ref(`${ROOT}/${currentRoom}/estado`).set('terminado');
-  // Guardar historial (una sola vez; usamos el jugador con menor orden como responsable de escribir)
+  if (fresh.estado === 'terminado') return; // ya se finalizó, evitamos guardar el historial dos veces
   const orden = fresh.ordenJugadores || Object.keys(fresh.jugadores);
   if (orden[0] === myId){
     const nombres = orden.map(uid => fresh.jugadores[uid].nombre);
@@ -798,6 +847,7 @@ async function finalizarPartida(fresh){
       fecha: new Date().toISOString()
     });
   }
+  await db.ref(`${ROOT}/${currentRoom}/estado`).set('terminado');
 }
 
 // ================= Otros jugadores (scroll horizontal) =================
@@ -825,7 +875,11 @@ function renderOtros(){
       fila.appendChild(label);
       FILAS[color].values.forEach((val, idx) => {
         const c = document.createElement('div');
-        c.className = `mini-celda ${color}-c` + (planilla.filas[color][idx] ? ' marcada' : '');
+        const maxIdx = maxIndexMarcado(planilla.filas[color]);
+        let extra = '';
+        if (planilla.filas[color][idx]) extra = ' marcada';
+        else if (idx < maxIdx) extra = ' descartada';
+        c.className = `mini-celda ${color}-c` + extra;
         fila.appendChild(c);
       });
       const cand = document.createElement('div');
@@ -873,25 +927,53 @@ async function renderFin(){
     rankingZone.appendChild(item);
   });
 
-  // Historial
+  // Botón "Jugar de nuevo", solo para el host
+  const btnRevancha = document.getElementById('btn-jugar-de-nuevo');
+  btnRevancha.style.display = (state.host === myId) ? 'block' : 'none';
+  btnRevancha.onclick = jugarDeNuevo;
+
+  // Historial — reintentamos una vez por si el guardado todavía no propagó
   const nombres = orden.map(uid => state.jugadores[uid].nombre);
   const groupKey = nombres.slice().sort((a,b)=>a.localeCompare(b)).join('|').toLowerCase();
-  const histSnap = await db.ref(`${ROOT_HIST}/${groupKey}`).once('value');
+  let histSnap = await db.ref(`${ROOT_HIST}/${groupKey}`).once('value');
+  if (!histSnap.exists()){
+    await new Promise(res => setTimeout(res, 600));
+    histSnap = await db.ref(`${ROOT_HIST}/${groupKey}`).once('value');
+  }
+
+  const histCont = document.getElementById('historial-contenido');
+  document.getElementById('historial-zone').style.display = 'block';
+
   if (histSnap.exists()){
     const partidas = Object.values(histSnap.val());
     const victorias = {};
     nombres.forEach(n => victorias[n] = 0);
     partidas.forEach(p => { if (victorias[p.ganador] !== undefined) victorias[p.ganador]++; });
-    const histCont = document.getElementById('historial-contenido');
     histCont.innerHTML = `<div class="historial-row"><span>Partidas jugadas</span><b>${partidas.length}</b></div>`;
     Object.entries(victorias).sort((a,b)=>b[1]-a[1]).forEach(([nombre, v]) => {
       histCont.innerHTML += `<div class="historial-row"><span>${nombre}</span><b>${v} victoria${v!==1?'s':''}</b></div>`;
     });
-    document.getElementById('historial-zone').style.display = 'block';
   } else {
-    document.getElementById('historial-zone').style.display = 'none';
+    // Todavía no se pudo confirmar el guardado; mostramos al menos el resultado de esta partida
+    histCont.innerHTML = `<div class="historial-row"><span>Partidas jugadas</span><b>1</b></div>` +
+      `<div class="historial-row"><span>${resultados[0].nombre}</span><b>1 victoria</b></div>`;
   }
 }
+
+async function jugarDeNuevo(){
+  const orden = ordenJugadoresActual();
+  const planillasNuevas = {};
+  orden.forEach(uid => { planillasNuevas[uid] = planillaVacia(); });
+  const nuevoTurnoInicial = (state.turnoActivo + 1) % orden.length;
+  await db.ref(`${ROOT}/${currentRoom}`).update({
+    estado: 'jugando',
+    planillas: planillasNuevas,
+    filasCerradas: { rojo:false, amarillo:false, verde:false, azul:false },
+    turnoActivo: nuevoTurnoInicial,
+    ronda: { activada:false, dados:null, usosBlancos:{}, marcoBlancosActivo:false, marcoColorActivo:false, filasCerradasSnapshot:{ rojo:false, amarillo:false, verde:false, azul:false } }
+  });
+}
+
 </script>
 </body>
 </html>
